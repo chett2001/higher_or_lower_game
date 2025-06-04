@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Higher or Lower Game</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: #f9f9f9;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .message {
+      font-size: 22px;
+      margin: 20px;
+      color: #333;
+    }
+
+    .lives {
+      font-size: 24px;
+      margin: 10px;
+    }
+
+    .buttons, .life-buttons {
+      margin: 20px 0;
+    }
+
+    .buttons button, .life-buttons button {
+      font-size: 20px;
+      width: 60px;
+      height: 60px;
+      margin: 5px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .buttons button:disabled {
+      background-color: #eee;
+      cursor: not-allowed;
+    }
+
+    .icon {
+      display: block;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    #play-again {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Guess the Number</h1>
+
+  <div class="life-buttons">
+    <div><strong>Select Lives:</strong></div>
+    <button onclick="setLives(1)">1</button>
+    <button onclick="setLives(2)">2</button>
+    <button onclick="setLives(3)">3</button>
+    <button onclick="setLives(4)">4</button>
+    <button onclick="setLives(5)">5</button>
+  </div>
+
+  <div class="message" id="message">Pick a number between 1 and 10</div>
+
+  <div class="buttons" id="number-buttons">
+    <!-- Number buttons go here -->
+  </div>
+
+  <div class="lives" id="lives">❤️ Lives: 3</div>
+
+  <button id="play-again" onclick="resetGame()">Play Again</button>
+
+  <script>
+    let targetNumber;
+    let lives = 3;
+    let maxLives = 3;
+
+    function setLives(newLives) {
+      maxLives = newLives;
+      resetGame();
+    }
+
+    function createNumberButtons() {
+      const container = document.getElementById('number-buttons');
+      container.innerHTML = '';
+      for (let i = 1; i <= 10; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.id = `btn-${i}`;
+        btn.onclick = () => handleGuess(i);
+        container.appendChild(btn);
+      }
+    }
+
+    function handleGuess(guess) {
+      if (lives <= 0) return;
+
+      const button = document.getElementById(`btn-${guess}`);
+      button.disabled = true;
+
+      const icon = document.createElement('span');
+      icon.classList.add('icon');
+
+      if (guess === targetNumber) {
+        icon.textContent = '✅';
+        button.appendChild(icon);
+        document.getElementById('message').textContent = `🎉 Correct! The number was ${targetNumber}.`;
+        endGame();
+      } else {
+        const hint = guess < targetNumber ? '🔼' : '🔽';
+        icon.textContent = hint;
+        button.appendChild(icon);
+
+        lives--;
+        document.getElementById('message').textContent = `❌ Nope! Try ${guess < targetNumber ? 'higher' : 'lower'}.`;
+        document.getElementById('lives').textContent = `❤️ Lives: ${lives}`;
+        if (lives === 0) {
+          document.getElementById('message').textContent = `💀 Game Over! The number was ${targetNumber}.`;
+          endGame();
+        }
+      }
+    }
+
+    function endGame() {
+      document.getElementById('play-again').style.display = 'inline-block';
+      Array.from(document.querySelectorAll('.buttons button')).forEach(btn => btn.disabled = true);
+    }
+
+    function resetGame() {
+      targetNumber = Math.floor(Math.random() * 10) + 1;
+      lives = maxLives;
+      document.getElementById('message').textContent = 'Pick a number between 1 and 10';
+      document.getElementById('lives').textContent = `❤️ Lives: ${lives}`;
+      document.getElementById('play-again').style.display = 'none';
+      createNumberButtons();
+    }
+
+    // Initial setup
+    resetGame();
+  </script>
+
+</body>
+</html>
